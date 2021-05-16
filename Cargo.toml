@@ -122,6 +122,10 @@ required-features = ["rt"]
 name = "pull_down_pin"
 required-features = ["rt"]
 
+[[example]]
+name = "eeprom"
+required-features = ["rt"]
+
 # Examples that require USB logging.
 
 [[example]]
