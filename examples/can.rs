@@ -61,11 +61,10 @@ fn main() -> ! {
     log::info!("Building CAN1 peripheral...");
     let mut can1 = can1_builder.build();
     can1.set_baud_rate(1_000_000);
-
-
+    can1.set_max_mailbox(16);
 
     loop {
-      systick.delay_ms(100);
+      systick.delay_ms(1000);
       led.toggle();
       can1.read_mailbox();
     }
