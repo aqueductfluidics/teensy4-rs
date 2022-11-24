@@ -24,19 +24,16 @@
 mod systick;
 mod usb_io;
 
-use core::time::Duration;
-
 use teensy4_panic as _;
 
 use cortex_m_rt::entry;
-use embedded_hal::{blocking::spi::Transfer, digital::v2::OutputPin};
 use teensy4_bsp as bsp;
 
 #[entry]
 fn main() -> ! {
     let mut peripherals = bsp::Peripherals::take().unwrap();
     let mut systick = systick::new(cortex_m::Peripherals::take().unwrap().SYST);
-    
+
     usb_io::init().unwrap();
     let pins = bsp::pins::t40::from_pads(peripherals.iomuxc);
 
@@ -58,18 +55,15 @@ fn main() -> ! {
         bsp::hal::ccm::can::PrescalarSelect::DIVIDE_1,
     );
 
-    log::info!("Building CAN1 peripheral...");
     let mut can1 = can1_builder.build();
     can1.set_baud_rate(1_000_000);
-
-
+    can1.set_max_mailbox(16);
+    // can1.enable_fifo(true);
+    can1.print_registers();
 
     loop {
-      systick.delay_ms(100);
-      led.toggle();
-      can1.read_mailbox();
+        systick.delay_ms(1000);
+        led.toggle();
+        can1.read_mailbox();
     }
-
 }
-
-
