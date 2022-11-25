@@ -58,7 +58,6 @@ fn main() -> ! {
     let mut can1 = can1_builder.build();
     can1.set_baud_rate(1_000_000);
     can1.set_max_mailbox(16);
-    // can1.enable_fifo(true);
     can1.print_registers();
 
     loop {
