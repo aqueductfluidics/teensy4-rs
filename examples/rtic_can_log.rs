@@ -31,8 +31,8 @@ type Consumer = heapless::spsc::Consumer<'static, Ty, { CAP }>;
 #[rtic::app(device = teensy4_bsp, peripherals = true, dispatchers = [LPUART8])]
 mod app {
     use crate::{systick, usb_io, Consumer, Producer, Queue};
-    use embedded_hal::digital::v2::OutputPin;
     use embedded_hal::serial::Read;
+    use embedded_hal::{can::Frame, can::StandardId, digital::v2::OutputPin};
     use imxrt1060_hal::iomuxc::consts::{Unsigned, U1, U2};
     use teensy4_bsp as bsp;
 
@@ -135,9 +135,7 @@ mod app {
         cx.shared.can1.lock(|can1| {
             can1.set_baud_rate(1_000_000);
             can1.set_max_mailbox(16);
-            can1.print_registers();
             can1.enable_fifo(true);
-            can1.print_registers();
             can1.enable_fifo_interrupt(true);
             can1.print_registers();
         });
@@ -146,21 +144,20 @@ mod app {
 
     #[task(shared = [can1], local = [q_tx])]
     fn can1(mut cx: can1::Context) {
-        // log::info!("CAN1 interrupt task called!");
         let q_tx = cx.local.q_tx;
+        const data: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 7];
+        let id = StandardId::new(0).unwrap();
+        let frame = Frame::new(id, &data).unwrap();
         cx.shared.can1.lock(|can1| {
-            can1.read_mailbox();
-            can1.write(0x00, 0xFF, 0xAA);
+            can1.transmit(&frame);
         });
         can1::spawn_after(100_u32.millis()).unwrap();
-
-        // while let Ok(b) = u_rx.read() {
-        //     q_tx.enqueue(b).ok();
-        // }
     }
 
-    #[task(binds = CAN1)]
+    #[task(binds = CAN1, shared = [can1],)]
     fn can1_int(mut cx: can1_int::Context) {
-        log::info!("CAN1 interrupt task called!");
+        cx.shared.can1.lock(|can1| {
+            can1.handle_interrupt();
+        });
     }
 }

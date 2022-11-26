@@ -63,6 +63,6 @@ fn main() -> ! {
     loop {
         systick.delay_ms(1000);
         led.toggle();
-        can1.read_mailbox();
+        can1.read_mailboxes();
     }
 }
