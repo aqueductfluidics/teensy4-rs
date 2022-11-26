@@ -111,12 +111,6 @@ mod app {
 
     #[task(local = [led, q_rx, blink_count])]
     fn blink(cx: blink::Context) {
-        // log::info!(
-        //     "`blink` called {} time{}",
-        //     *cx.local.blink_count,
-        //     if *cx.local.blink_count > 1 { "s" } else { "" }
-        // );
-
         if cx.local.q_rx.ready() {
             let mut buffer = [0u8; 256];
             for elem in buffer.iter_mut() {
@@ -138,10 +132,13 @@ mod app {
 
     #[task(shared = [can1])]
     fn can1_init(mut cx: can1_init::Context) {
-        // log::info!("CAN1 initializing!");
         cx.shared.can1.lock(|can1| {
             can1.set_baud_rate(1_000_000);
             can1.set_max_mailbox(16);
+            can1.print_registers();
+            can1.enable_fifo(true);
+            can1.print_registers();
+            can1.enable_fifo_interrupt(true);
             can1.print_registers();
         });
         can1::spawn_after(100_u32.millis()).unwrap();
@@ -153,11 +150,17 @@ mod app {
         let q_tx = cx.local.q_tx;
         cx.shared.can1.lock(|can1| {
             can1.read_mailbox();
+            can1.write(0x00, 0xFF, 0xAA);
         });
         can1::spawn_after(100_u32.millis()).unwrap();
 
         // while let Ok(b) = u_rx.read() {
         //     q_tx.enqueue(b).ok();
         // }
+    }
+
+    #[task(binds = CAN1)]
+    fn can1_int(mut cx: can1_int::Context) {
+        log::info!("CAN1 interrupt task called!");
     }
 }
