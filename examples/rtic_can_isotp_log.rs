@@ -18,6 +18,7 @@
 
 use teensy4_bsp as bsp;
 use teensy4_panic as _;
+mod isotp;
 mod systick;
 mod usb_io;
 
@@ -28,18 +29,14 @@ type Queue = heapless::spsc::Queue<Ty, { CAP }>;
 type Producer = heapless::spsc::Producer<'static, Ty, { CAP }>;
 type Consumer = heapless::spsc::Consumer<'static, Ty, { CAP }>;
 
-trait Delayable: Fn(u32) -> () + Sized {}
-
 #[rtic::app(device = teensy4_bsp, peripherals = true, dispatchers = [LPUART8])]
 mod app {
-    use crate::{systick, usb_io, Consumer, Producer, Queue, Delayable};
+    use crate::{isotp, systick, usb_io, Consumer, Producer, Queue};
+    use dwt_systick_monotonic::{fugit::ExtU32, DwtSystick};
     use embedded_hal::serial::Read;
     use embedded_hal::{can::Frame, can::StandardId, digital::v2::OutputPin};
-    use imxrt1060_hal::can::{IsoTP, IsoTPBuilder};
     use imxrt1060_hal::iomuxc::consts::{Unsigned, U1, U2};
     use teensy4_bsp as bsp;
-
-    use dwt_systick_monotonic::{fugit::ExtU32, DwtSystick};
 
     const BAUD: u32 = 115_200;
     const TX_FIFO_SIZE: u8 = 4;
@@ -57,7 +54,7 @@ mod app {
 
     #[shared]
     struct Shared {
-        isotp: IsoTP<U1, Delayable<Output = ()>, Delayable<Output = ()>>,
+        isotp: isotp::IsoTP<U1>,
     }
 
     #[init(local = [
@@ -98,7 +95,7 @@ mod app {
             while monotonics::now() < wait_until { /* spin */ }
         };
 
-        let mut isotp_builder = IsoTPBuilder::new(can1, delay_ms, delay_us);
+        let mut isotp_builder = isotp::IsoTPBuilder::new(can1);
         let isotp = isotp_builder.build();
 
         // The queue used for buffering bytes.
@@ -168,7 +165,7 @@ mod app {
             for _ in 0..5 {
                 let wait_until = monotonics::now() + (10 as u32).millis();
                 while monotonics::now() < wait_until { /* spin */ }
-                isotp.can.transmit(&frame);
+                isotp.write(&frame);
                 log::info!("{:?}", monotonics::now());
             }
         });
