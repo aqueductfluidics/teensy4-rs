@@ -16,7 +16,6 @@
 #![no_std]
 #![no_main]
 
-use teensy4_bsp as bsp;
 use teensy4_panic as _;
 mod systick;
 mod usb_io;
@@ -30,10 +29,9 @@ type Consumer = heapless::spsc::Consumer<'static, Ty, { CAP }>;
 
 #[rtic::app(device = teensy4_bsp, peripherals = true, dispatchers = [LPUART8])]
 mod app {
-    use crate::{systick, usb_io, Consumer, Producer, Queue};
-    use embedded_hal::serial::Read;
+    use crate::{usb_io, Consumer, Producer, Queue};
     use embedded_hal::{can::Frame, can::StandardId, digital::v2::OutputPin};
-    use imxrt1060_hal::iomuxc::consts::{Unsigned, U1, U2};
+    use imxrt1060_hal::iomuxc::consts::U1;
     use teensy4_bsp as bsp;
 
     use dwt_systick_monotonic::{fugit::ExtU32, DwtSystick};

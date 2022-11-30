@@ -99,10 +99,6 @@ default-target = "thumbv7em-none-eabihf"
 # Examples that just need a runtime
 
 [[example]]
-name = "can"
-required-features = ["rt", "rtic", "usb-logging"]
-
-[[example]]
 name = "configure_pin_function"
 required-features = ["rt"]
 
@@ -127,6 +123,10 @@ name = "pull_down_pin"
 required-features = ["rt"]
 
 # Examples that require USB logging.
+
+[[example]]
+name = "can"
+required-features = ["rt", "usb-logging"]
 
 [[example]]
 name = "dma_memcpy"
@@ -191,6 +191,10 @@ required-features = ["rt", "rtic"]
 [[example]]
 name = "rtic_pit"
 required-features = ["rt", "rtic"]
+
+[[example]]
+name = "rtic_can_log"
+required-features = ["rt", "rtic", "usb-logging"]
 
 [[example]]
 name = "rtic_uart_log"
