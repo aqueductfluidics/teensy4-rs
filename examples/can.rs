@@ -58,6 +58,27 @@ fn main() -> ! {
     let mut can1 = can1_builder.build();
     can1.set_baud_rate(1_000_000);
     can1.set_max_mailbox(16);
+    can1.enable_fifo();
+    can1.set_fifo_interrupt(true);
+    can1.set_fifo_reject_all();
+    can1.set_fifo_filter(
+        0,
+        0,
+        bsp::hal::can::filter::FlexCanIde::Std,
+        bsp::hal::can::filter::FlexCanIde::None,
+    );
+    can1.set_fifo_filter(
+        1,
+        0x7E5,
+        bsp::hal::can::filter::FlexCanIde::Std,
+        bsp::hal::can::filter::FlexCanIde::None,
+    );
+    can1.set_fifo_filter(
+        2,
+        0x7E5,
+        bsp::hal::can::filter::FlexCanIde::Std,
+        bsp::hal::can::filter::FlexCanIde::None,
+    );
     can1.print_registers();
 
     loop {
