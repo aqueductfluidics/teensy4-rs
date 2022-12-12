@@ -1,22 +1,12 @@
-//! Demonstrates how to use a SPI master.
-//! Similar to the I2C example, we try to
-//! read the WHO_AM_I register from an MPU9250.
+//! Demonstrates how to use a FlexCAN peripheral.
 //!
 //! Pinout:
 //!
-//! - Teensy 4 Pin 13 (SCK) to MPU's SCL (Note that we lose the LED here)
-//! - Teensy 4 Pin 11 (MOSI) to MPU's SDA/SDI
-//! - Teensy 4 Pin 12 (MISO) to MPU's AD0/SDO
-//! - Teensy 4 Pin 10 (PSC0) to MPU's NCS
+//! - Teensy 4 Pin 22 (CAN1 TX) to TX pin of CAN Transceiver 
+//! - Teensy 4 Pin 23 (CAN2 RX) to RX pin of CAN Transceiver 
 //!
-//! By default, the example utilizes the SPI's internal chip select pin, rather
-//! than relying on an arbitrary GPIO to control the chip select. However, you
-//! may consider using an arbitrary GPIO for chip select. The example supports
-//! that as well.
+//! A Can transceiver (such as the Texas Instruments SN65HVD230) is required for this demo.
 //!
-//! Success criteria: the SPI clock rate is 1MHz. We can read both the MPU9250's
-//! `WHO_AM_I` register (returns 0x71), and also the AK8963's `WHO_AM_I` register
-//! (returns 0x48).
 
 #![no_std]
 #![no_main]
@@ -56,34 +46,22 @@ fn main() -> ! {
     );
 
     let mut can1 = can1_builder.build();
+    
     can1.set_baud_rate(1_000_000);
     can1.set_max_mailbox(16);
     can1.enable_fifo();
     can1.set_fifo_interrupt(true);
-    can1.set_fifo_reject_all();
-    can1.set_fifo_filter(
-        0,
-        0,
-        bsp::hal::can::filter::FlexCanIde::Std,
-        bsp::hal::can::filter::FlexCanIde::None,
-    );
-    can1.set_fifo_filter(
-        1,
-        0x7E5,
-        bsp::hal::can::filter::FlexCanIde::Std,
-        bsp::hal::can::filter::FlexCanIde::None,
-    );
-    can1.set_fifo_filter(
-        2,
-        0x7E5,
-        bsp::hal::can::filter::FlexCanIde::Std,
-        bsp::hal::can::filter::FlexCanIde::None,
-    );
+    can1.set_fifo_accept_all();
     can1.print_registers();
+
+    let id = bsp::hal::can::Id::from(bsp::hal::can::StandardId::new(0x00).unwrap());
+    let data: [u8; 8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07];
+    let frame = bsp::hal::can::Frame::new_data(id, data);
 
     loop {
         systick.delay_ms(1000);
         led.toggle();
         can1.read_mailboxes();
+        can1.transmit(&frame);
     }
 }

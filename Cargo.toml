@@ -46,7 +46,7 @@ version = "0.3"
 
 [dependencies.imxrt1060-hal]
 version = "0.5.0-alpha"
-path = "../imxrt-hal/imxrt1060-hal" 
+path = "../imxrt-hal/imxrt-hal" 
 
 [dependencies.teensy4-pins]
 version = "0.2"
