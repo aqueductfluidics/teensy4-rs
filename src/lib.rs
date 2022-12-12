@@ -101,7 +101,7 @@ pub use hal::ral::interrupt;
 pub use hal::ral::{interrupt as Interrupt, NVIC_PRIO_BITS};
 
 pub use hal::Peripherals;
-pub use imxrt1060_hal as hal;
+pub use imxrt_hal as hal;
 
 /// The LED
 ///

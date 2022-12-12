@@ -44,8 +44,7 @@ features = ["device"]
 path = "teensy4-fcb"
 version = "0.3"
 
-[dependencies.imxrt1060-hal]
-version = "0.5.0-alpha"
+[dependencies.imxrt-hal]
 path = "../imxrt-hal/imxrt-hal" 
 
 [dependencies.teensy4-pins]
@@ -71,9 +70,9 @@ default = ["usb-logging"]
 # Enables the USB logging stack
 usb-logging = ["log"]
 # Provides the `Peripherals::steal` constructor required by `rtic`.
-rtic = ["imxrt1060-hal/rtic"]
+rtic = ["imxrt-hal/rtic"]
 # Enables cortex-m-rt runtime support
-rt = ["cortex-m-rt", "imxrt1060-hal/rt"]
+rt = ["cortex-m-rt", "imxrt-hal/rt"]
 
 # Most teensy4-rs documentation tells the user to favor release builds.
 # However, it might be nice to disable optimizations when evaluating
