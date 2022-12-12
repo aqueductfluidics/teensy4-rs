@@ -140,6 +140,10 @@ name = "dma_uart"
 required-features = ["rt", "usb-logging"]
 
 [[example]]
+name = "eeprom"
+required-features = ["rt", "usb-logging"]
+
+[[example]]
 name = "i2c"
 required-features = ["rt", "usb-logging"]
 

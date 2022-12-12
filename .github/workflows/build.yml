@@ -49,6 +49,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build USB stack
       run: make -C bin libt4usb.a
+    - name: Build EEPROM 
+      run: make -C bin libt4eeprom.a
 
   test:
     runs-on: ubuntu-latest

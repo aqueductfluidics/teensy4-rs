@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "avr_functions.h": "c",
+    "imxrt.h": "c",
+    "stddef.h": "c",
+    "stdint.h": "c",
+    "string.h": "c",
+    "printf.h": "c"
+  }
+}
