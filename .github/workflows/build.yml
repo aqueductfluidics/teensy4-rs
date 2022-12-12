@@ -3,6 +3,7 @@ name: Code Checks
 on:
   push:
     branches: [ master, staging, trying ]
+  workflow_dispatch: 
 
 jobs:
 
