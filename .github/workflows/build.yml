@@ -52,10 +52,10 @@ jobs:
       run: make -C bin libt4usb.a
     - name: Build EEPROM 
       run: make -C bin libt4eeprom.a
-      - uses: actions/upload-artifact@v3
-        with:
-          name: libt4eeprom.a
-          path: bin/libt4eeprom.a
+    - uses: actions/upload-artifact@v3
+      with:
+        name: libt4eeprom.a
+        path: bin/libt4eeprom.a
 
   test:
     runs-on: ubuntu-latest
