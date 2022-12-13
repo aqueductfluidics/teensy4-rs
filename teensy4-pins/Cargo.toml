@@ -22,8 +22,9 @@ keywords = [
 ]
 
 [dependencies.imxrt-iomuxc]
-version = "0.1.5"
 features = ["imxrt106x"]
+git = "https://github.com/dstric-aqueduct/imxrt-iomuxc.git"
+tag = "v0.1.5-can"
 
 [package.metadata.docs.rs]
 default-target = "thumbv7em-none-eabihf"
