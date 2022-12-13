@@ -99,7 +99,7 @@ const LUT: LookupTable = LookupTable::new()
 // Common FlexSPI configuration block
 //
 
-const COMMON_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
+const T40_FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
     flexspi::ConfigurationBlock::new(LUT)
         .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
         .cs_hold_time(0x01)
@@ -111,14 +111,34 @@ const COMMON_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
         .serial_clk_freq(SerialClockFrequency::MHz60)
         .serial_flash_pad_type(FlashPadType::Quad);
 
+const T41_FLEXSPI_CONFIGURATION_BLOCK: flexspi::ConfigurationBlock =
+    flexspi::ConfigurationBlock::new(LUT)
+        .read_sample_clk_src(ReadSampleClockSource::LoopbackFromDQSPad)
+        .cs_hold_time(0x01)
+        .cs_setup_time(0x02)
+        .column_address_width(ColumnAddressWidth::OtherDevices)
+        .device_mode_configuration(DeviceModeConfiguration::Disabled)
+        .wait_time_cfg_commands(WaitTimeConfigurationCommands::disable())
+        .flash_size(SerialFlashRegion::A1, 0x0080_0000)
+        .serial_clk_freq(SerialClockFrequency::MHz60)
+        .serial_flash_pad_type(FlashPadType::Quad);
+
 //
 // Final serial NOR configuration block
 //
 
 #[no_mangle]
 #[link_section = ".fcb"]
-pub static FLEXSPI_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
-    nor::ConfigurationBlock::new(COMMON_CONFIGURATION_BLOCK)
+pub static T40_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
+    nor::ConfigurationBlock::new(T40_FLEXSPI_CONFIGURATION_BLOCK)
+        .page_size(256)
+        .sector_size(4096)
+        .ip_cmd_serial_clk_freq(nor::SerialClockFrequency::MHz30);
+
+#[no_mangle]
+#[link_section = ".fcb"]
+pub static T41_NOR_CONFIGURATION_BLOCK: nor::ConfigurationBlock =
+    nor::ConfigurationBlock::new(T41_FLEXSPI_CONFIGURATION_BLOCK)
         .page_size(256)
         .sector_size(4096)
         .ip_cmd_serial_clk_freq(nor::SerialClockFrequency::MHz30);

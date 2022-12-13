@@ -11,11 +11,10 @@ RUN mkdir -p /home/make
 
 COPY /bin /home/make/bin
 
-VOLUME /home/make
-
 WORKDIR /home/make
 
 RUN make -C bin libt4usb.a
-RUN make -C bin libt4eeprom.a
+RUN make -C bin libt40eeprom.a CPPFLAGS="-DTEENSY40" 
+RUN make -C bin libt41eeprom.a CPPFLAGS="-DTEENSY41" 
 
 RUN /bin/bash

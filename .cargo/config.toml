@@ -1,6 +1,11 @@
+[target.'cfg(feature = "t41")'.thumbv7em-none-eabihf]
+rustflags = [
+    "-C", "link-arg=-Tt41link.x",
+]
+
 [target.thumbv7em-none-eabihf]
 rustflags = [
-    "-C", "link-arg=-Tt4link.x",
+    "-C", "link-arg=-Tt40link.x",
 ]
 
 runner = ["cargo", "run", "--package",  "tools", "--bin", "runner", "--"]

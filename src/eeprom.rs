@@ -4,13 +4,11 @@
 
 use core::sync::atomic::{AtomicBool, Ordering};
 
-/// Bindings to the Teensy 4's EEPROM module
 #[cfg_attr(target_arch = "arm", link(name = "t4eeprom"))]
 extern "C" {
     pub fn eeprom_initialize();
     pub fn eeprom_read_byte(addr_ptr: *const u8) -> u8;
     pub fn eeprom_write_byte(addr_ptr: *const u8, data: u8);
-    // TODO the rest...
 }
 
 static TAKEN: AtomicBool = AtomicBool::new(false);

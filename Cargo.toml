@@ -17,7 +17,8 @@ include = [
     "examples/*",
     "src/*",
     "build.rs",
-    "t4link.x",
+    "t40link.x",
+    "t41link.x",
     "README.md",
     "LICENSE-*"
 ]
@@ -73,6 +74,8 @@ usb-logging = ["log"]
 rtic = ["imxrt-hal/rtic"]
 # Enables cortex-m-rt runtime support
 rt = ["cortex-m-rt", "imxrt-hal/rt"]
+# Enables compilation for Teensy 4.1
+t41 = []
 
 # Most teensy4-rs documentation tells the user to favor release builds.
 # However, it might be nice to disable optimizations when evaluating

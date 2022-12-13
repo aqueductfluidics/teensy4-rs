@@ -5,12 +5,15 @@ CPPFLAGS= -DUSB_SERIAL -D__IMXRT1062__ -DFLASHMEM="__attribute__((section(\".fla
 AS=arm-none-eabi-as
 ASFLAGS=-march=armv7e-m -mthumb -k -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 -mlittle-endian
 
-all: libt4eeprom.a libt4usb.a libt4start.a
+all: libt40eeprom.a libt41eeprom.a libt4usb.a libt4start.a
 
 SRC_EEPROM=eeprom.c
 OBJS_EEPROM=$(SRC_EEPROM:.c=.o)
 
-libt4eeprom.a: $(OBJS_EEPROM)
+libt40eeprom.a: $(OBJS_EEPROM)
+	$(AR) -rcs $@ $(OBJS_EEPROM)
+
+libt41eeprom.a: $(OBJS_EEPROM)
 	$(AR) -rcs $@ $(OBJS_EEPROM)
 
 SRCS_USB=$(wildcard usb*.c) nonstd.c
@@ -27,4 +30,4 @@ libt4start.a: $(OBJS_START)
 
 .PHONY: clean
 clean:
-	rm -f libt4start.a libt4usb.a *.o *.d
+	rm -f libt40eeprom.a libt41eeprom.a libt4start.a libt4usb.a *.o *.d
