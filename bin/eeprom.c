@@ -28,33 +28,26 @@
  * SOFTWARE.
  */
 
+// To configure the EEPROM size, edit E2END in avr/eeprom.h.
+//
+// Generally you should avoid editing this code, unless you really
+// know what you're doing.
+
 #include "imxrt.h"
-#include <stddef.h>
-#include <stdint.h>
 #include <string.h>
-#include "avr_functions.h"
 #include "debug/printf.h"
 
-#define ARDUINO_TEENSY41
+// NOTE(mciantyre) these numbers represent the Teensy 4.0
+// values from the Teensy cores project.
+// #define FLASH_BASEADDR 0x601F0000
+// #define FLASH_SECTORS  15
+// #define E2END 0x437	// From avr/eeprom.h in upstream.
 
-#if defined(ARDUINO_TEENSY40)
-#define FLASH_BASEADDR 0x601F0000
-#define FLASH_SECTORS  15
-#elif defined(ARDUINO_TEENSY41)
+// these numbers represent the Teensy 4.1
+// values from the Teensy cores project.
 #define FLASH_BASEADDR 0x607C0000
 #define FLASH_SECTORS  63
-#elif defined(ARDUINO_TEENSY_MICROMOD)
-#define FLASH_BASEADDR 0x60FC0000
-#define FLASH_SECTORS  63
-#endif
-
-#if defined(ARDUINO_TEENSY40)
-#define E2END 0x437
-#elif defined(ARDUINO_TEENSY41)
 #define E2END 0x10BB
-#elif defined(ARDUINO_TEENSY_MICROMOD)
-#define E2END 0x10BB
-#endif
 
 #if E2END > (255*FLASH_SECTORS-1)
 #error "E2END is set larger than the maximum possible EEPROM size"
@@ -66,8 +59,6 @@
 // To be called from LittleFS_Program, any other use at your own risk!
 void eepromemu_flash_write(void *addr, const void *data, uint32_t len);
 void eepromemu_flash_erase_sector(void *addr);
-void eepromemu_flash_erase_32K_block(void *addr);
-void eepromemu_flash_erase_64K_block(void *addr);
 
 static uint8_t initialized=0;
 static uint16_t sector_index[FLASH_SECTORS];
@@ -307,54 +298,6 @@ void eepromemu_flash_erase_sector(void *addr)
 	FLEXSPI_INTR = FLEXSPI_INTR_IPCMDDONE;
 	FLEXSPI_LUT60 = LUT0(CMD_SDR, PINS1, 0x20) | LUT1(ADDR_SDR, PINS1, 24); // 20 = sector erase
 	FLEXSPI_IPCR0 = (uint32_t)addr & 0x00FFF000;
-	FLEXSPI_IPCR1 = FLEXSPI_IPCR1_ISEQID(15);
-	FLEXSPI_IPCMD = FLEXSPI_IPCMD_TRG;
-	while (!(FLEXSPI_INTR & FLEXSPI_INTR_IPCMDDONE)) ; // wait
-	FLEXSPI_INTR = FLEXSPI_INTR_IPCMDDONE;
-	flash_wait();
-}
-
-void eepromemu_flash_erase_32K_block(void *addr)
-{
-	__disable_irq();
-	FLEXSPI_LUTKEY = FLEXSPI_LUTKEY_VALUE;
-	FLEXSPI_LUTCR = FLEXSPI_LUTCR_UNLOCK;
-	FLEXSPI_LUT60 = LUT0(CMD_SDR, PINS1, 0x06); // 06 = write enable
-	FLEXSPI_LUT61 = 0;
-	FLEXSPI_LUT62 = 0;
-	FLEXSPI_LUT63 = 0;
-	FLEXSPI_IPCR0 = 0;
-	FLEXSPI_IPCR1 = FLEXSPI_IPCR1_ISEQID(15);
-	FLEXSPI_IPCMD = FLEXSPI_IPCMD_TRG;
-	arm_dcache_delete((void *)((uint32_t)addr & 0xFFFF8000), 32768); // purge data from cache
-	while (!(FLEXSPI_INTR & FLEXSPI_INTR_IPCMDDONE)) ; // wait
-	FLEXSPI_INTR = FLEXSPI_INTR_IPCMDDONE;
-	FLEXSPI_LUT60 = LUT0(CMD_SDR, PINS1, 0x52) | LUT1(ADDR_SDR, PINS1, 24); // 20 = sector erase
-	FLEXSPI_IPCR0 = (uint32_t)addr & 0x00FF8000;
-	FLEXSPI_IPCR1 = FLEXSPI_IPCR1_ISEQID(15);
-	FLEXSPI_IPCMD = FLEXSPI_IPCMD_TRG;
-	while (!(FLEXSPI_INTR & FLEXSPI_INTR_IPCMDDONE)) ; // wait
-	FLEXSPI_INTR = FLEXSPI_INTR_IPCMDDONE;
-	flash_wait();
-}
-
-void eepromemu_flash_erase_64K_block(void *addr)
-{
-	__disable_irq();
-	FLEXSPI_LUTKEY = FLEXSPI_LUTKEY_VALUE;
-	FLEXSPI_LUTCR = FLEXSPI_LUTCR_UNLOCK;
-	FLEXSPI_LUT60 = LUT0(CMD_SDR, PINS1, 0x06); // 06 = write enable
-	FLEXSPI_LUT61 = 0;
-	FLEXSPI_LUT62 = 0;
-	FLEXSPI_LUT63 = 0;
-	FLEXSPI_IPCR0 = 0;
-	FLEXSPI_IPCR1 = FLEXSPI_IPCR1_ISEQID(15);
-	FLEXSPI_IPCMD = FLEXSPI_IPCMD_TRG;
-	arm_dcache_delete((void *)((uint32_t)addr & 0xFFFF0000), 65536); // purge data from cache
-	while (!(FLEXSPI_INTR & FLEXSPI_INTR_IPCMDDONE)) ; // wait
-	FLEXSPI_INTR = FLEXSPI_INTR_IPCMDDONE;
-	FLEXSPI_LUT60 = LUT0(CMD_SDR, PINS1, 0xD8) | LUT1(ADDR_SDR, PINS1, 24); // 20 = sector erase
-	FLEXSPI_IPCR0 = (uint32_t)addr & 0x00FF0000;
 	FLEXSPI_IPCR1 = FLEXSPI_IPCR1_ISEQID(15);
 	FLEXSPI_IPCMD = FLEXSPI_IPCMD_TRG;
 	while (!(FLEXSPI_INTR & FLEXSPI_INTR_IPCMDDONE)) ; // wait
