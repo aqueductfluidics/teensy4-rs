@@ -17,6 +17,7 @@ include = [
     "examples/*",
     "src/*",
     "build.rs",
+    "t4link.x",
     "t40link.x",
     "t41link.x",
     "README.md",
