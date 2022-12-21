@@ -13,6 +13,9 @@ include = [
     "bin/**/*.h",
     "bin/**/*.c",
     "bin/libt4usb.a",
+    "bin/libt4start.a",
+    "bin/libt40eeprom.a",
+    "bin/libt41eeprom.a",
     "bin/Makefile",
     "examples/*",
     "src/*",
@@ -181,6 +184,10 @@ required-features = ["rt", "usb-logging"]
 
 [[example]]
 name = "usb_writer"
+required-features = ["rt", "usb-logging"]
+
+[[example]]
+name = "wdog"
 required-features = ["rt", "usb-logging"]
 
 # ----

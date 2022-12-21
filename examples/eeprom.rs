@@ -17,15 +17,15 @@ fn main() -> ! {
     systick.delay_ms(50);
 
     let mut eeprom = bsp::eeprom::Eeprom::new().unwrap();
-   
+
     log::info!("Starting loop...");
 
     let mut counter = 0;
     let mut buffer: [u8; 100] = [0x00; 100];
 
-    // for i in 0..100 {
-    //     eeprom.write_byte(i, i as u8);
-    // }
+    for i in 0..100 {
+        eeprom.write_byte(i, i as u8);
+    }
 
     loop {
         systick.delay_ms(5000);

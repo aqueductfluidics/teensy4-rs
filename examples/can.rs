@@ -53,6 +53,7 @@ fn main() -> ! {
     can1.set_fifo_interrupt(true);
     can1.set_fifo_accept_all();
     can1.print_registers();
+    can1.get_clock();
 
     let id = bsp::hal::can::Id::from(bsp::hal::can::StandardId::new(0x00).unwrap());
     let data: [u8; 8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07];
