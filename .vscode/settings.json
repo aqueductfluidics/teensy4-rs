@@ -6,5 +6,5 @@
     "stdint.h": "c",
     "string.h": "c",
     "printf.h": "c"
-  }
+  },
 }
