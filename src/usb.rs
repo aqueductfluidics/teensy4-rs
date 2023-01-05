@@ -344,11 +344,14 @@ struct Logger {
     /// A collection of targets that we are expected
     /// to filter. If this is empty, we allow everything
     filters: Filters,
+    /// Write Data
+    write_data: bool,
 }
 
 static mut LOGGER: Logger = Logger {
     enabled: false,
     filters: Filters::empty(),
+    write_data: false,
 };
 
 impl ::log::Log for Logger {
@@ -362,21 +365,40 @@ impl ::log::Log for Logger {
     fn log(&self, record: &::log::Record) {
         if self.enabled(record.metadata()) {
             use core::fmt::Write;
-            let result = cortex_m::interrupt::free(|_| {
-                writeln!(
-                    unsafe { Writer::new() },
-                    "[{} {}]: {}",
-                    record.level(),
-                    record.target(),
-                    record.args()
-                )
-            });
+            let result = if self.write_data {
+                cortex_m::interrupt::free(|_| {
+                    writeln!(unsafe { Writer::new() }, "[DATA]: {}", record.args())
+                })
+            } else {
+                cortex_m::interrupt::free(|_| {
+                    writeln!(
+                        unsafe { Writer::new() },
+                        "[{} {}]: {}",
+                        record.level(),
+                        record.target(),
+                        record.args()
+                    )
+                })
+            };
             assert!(result.is_ok());
         }
     }
 
     fn flush(&self) {
         cortex_m::interrupt::free(|_| unsafe { bindings::usb_serial_flush_output() });
+    }
+}
+
+pub fn write_data<F>(f: F)
+where
+    F: FnOnce() -> (),
+{
+    unsafe {
+        LOGGER.write_data = true;
+    }
+    f();
+    unsafe {
+        LOGGER.write_data = false;
     }
 }
 
