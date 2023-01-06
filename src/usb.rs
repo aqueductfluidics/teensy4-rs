@@ -383,7 +383,7 @@ impl ::log::Log for Logger {
 pub fn write_data<B: AsRef<[u8]>>(b: B) {
     let mut w = unsafe { Writer::new() };
     w.write(b).ok();
-    w.write("\n").ok();
+    w.write("\r\n").ok();
 }
 
 /// A type that can send data to a USB serial host
