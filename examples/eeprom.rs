@@ -19,6 +19,7 @@ use teensy4_bsp as bsp;
 
 const PERIOD_MS: u32 = 1_000;
 const EEPROM_RW_ADDRESS: usize = 42;
+const EEPROM_RW_SLICE_ADDRESS: usize = 314;
 const EEPROM_PERSISTENCE_ADDRESS: usize = 137;
 const EEPROM_SENTINEL: u8 = 42;
 
@@ -63,6 +64,28 @@ fn main() -> ! {
                 "Intentionally writing out of bounds... {:?}",
                 eeprom.read_byte(0xDEADBEEF)
             );
+            log::warn!("Intentionally reading slice of bounds... {:?}", {
+                let mut buffer = [0u8; 7];
+                eeprom.read_bytes_exact(1080, &mut buffer)
+            });
+            log::warn!("Intentionally writing slice of bounds... {:?}", {
+                let buffer = [0u8; 7];
+                eeprom.write_bytes_exact(1080, &buffer)
+            });
+        }
+
+        if rw_val % 3 == 0 {
+            let mut buffer = [0u8; 7];
+            eeprom
+                .read_bytes_exact(EEPROM_RW_SLICE_ADDRESS, &mut buffer)
+                .unwrap();
+            log::info!("Incrementing buffer {:?}", buffer);
+            buffer
+                .iter_mut()
+                .for_each(|item| *item = item.wrapping_add(1));
+            eeprom
+                .write_bytes_exact(EEPROM_RW_SLICE_ADDRESS, &buffer)
+                .unwrap();
         }
     }
 }
