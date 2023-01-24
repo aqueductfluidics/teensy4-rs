@@ -39,19 +39,9 @@
 
 // NOTE(mciantyre) these numbers represent the Teensy 4.0
 // values from the Teensy cores project.
-#ifdef TEENSY40
 #define FLASH_BASEADDR 0x601F0000
 #define FLASH_SECTORS  15
-#define E2END 0x437	
-#endif
-
-// these numbers represent the Teensy 4.1
-// values from the Teensy cores project.
-#ifdef TEENSY41
-#define FLASH_BASEADDR 0x607C0000
-#define FLASH_SECTORS  63
-#define E2END 0x10BB
-#endif
+#define E2END 0x437	// From avr/eeprom.h in upstream.
 
 #if E2END > (255*FLASH_SECTORS-1)
 #error "E2END is set larger than the maximum possible EEPROM size"

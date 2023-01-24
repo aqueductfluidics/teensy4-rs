@@ -9,6 +9,7 @@ extern "C" {
     pub fn eeprom_initialize();
     pub fn eeprom_read_byte(addr_ptr: *const u8) -> u8;
     pub fn eeprom_write_byte(addr_ptr: *const u8, data: u8);
+    // TODO the rest...
 }
 
 static TAKEN: AtomicBool = AtomicBool::new(false);
@@ -16,7 +17,7 @@ static TAKEN: AtomicBool = AtomicBool::new(false);
 /// Provides read/write access to EEPROM
 ///
 /// There's only one of these available in a given program.
-pub struct Eeprom {}
+pub struct Eeprom(());
 
 impl Eeprom {
     /// Create an `Eeprom` that controls I/O with the EEPROM emulation region
@@ -28,7 +29,7 @@ impl Eeprom {
             None
         } else {
             unsafe { eeprom_initialize() };
-            Some(Eeprom {})
+            Some(Eeprom(()))
         }
     }
     /// Read a byte from the EEPROM emulation region
