@@ -28,7 +28,10 @@
  * SOFTWARE.
  */
 
-// To configure the EEPROM size, edit E2END in avr/eeprom.h.
+// To configure the EEPROM size, edit E2END in
+// the Rust module. The meaning of that E2END Rust
+// constant is the same as the meaning in the
+// official module.
 //
 // Generally you should avoid editing this code, unless you really
 // know what you're doing.
@@ -41,11 +44,6 @@
 // values from the Teensy cores project.
 #define FLASH_BASEADDR 0x601F0000
 #define FLASH_SECTORS  15
-#define E2END 0x437	// From avr/eeprom.h in upstream.
-
-#if E2END > (255*FLASH_SECTORS-1)
-#error "E2END is set larger than the maximum possible EEPROM size"
-#endif
 
 // Conversation about how this code works & what the upper limits are
 // https://forum.pjrc.com/threads/57377?p=214566&viewfull=1#post214566
@@ -81,7 +79,6 @@ uint8_t eeprom_read_byte(const uint8_t *addr_ptr)
 	const uint16_t *p, *end;
 	uint8_t data=0xFF;
 
-	if (addr > E2END) return 0xFF;
 	if (!initialized) eeprom_initialize();
 	sector = (addr >> 2) % FLASH_SECTORS;
 	offset = (addr & 3) | (((addr >> 2) / FLASH_SECTORS) << 2);
@@ -104,7 +101,6 @@ void eeprom_write_byte(uint8_t *addr_ptr, uint8_t data)
 	uint8_t olddata=0xFF;
 	uint8_t buf[256];
 
-	if (addr > E2END) return;
 	if (!initialized) eeprom_initialize();
 
 	sector = (addr >> 2) % FLASH_SECTORS; 

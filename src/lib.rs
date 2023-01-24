@@ -92,7 +92,7 @@ mod rt;
 pub mod usb;
 
 mod eeprom;
-pub use eeprom::Eeprom;
+pub use eeprom::{Eeprom, EepromError, EEPROM_CAPACITY};
 #[cfg(all(target_arch = "arm", feature = "rt"))]
 pub use rt::{dtcm_heap_start, heap_len, heap_start};
 

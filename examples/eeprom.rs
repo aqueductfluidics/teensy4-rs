@@ -32,7 +32,7 @@ fn main() -> ! {
     let mut led = bsp::configure_led(pins.p13);
 
     let mut eeprom = bsp::Eeprom::new().unwrap();
-    if EEPROM_SENTINEL == eeprom.read_byte(EEPROM_PERSISTENCE_ADDRESS) {
+    if EEPROM_SENTINEL == eeprom.read_byte(EEPROM_PERSISTENCE_ADDRESS).unwrap() {
         // Run this example at least once. Then, power cycle your Teensy4. You
         // should see this branch of code is hit (manifests as the LED turns on
         // immediately, instead of after one second.)
@@ -41,15 +41,28 @@ fn main() -> ! {
     } else {
         log::warn!("No EEPROM_SENTINEL");
     }
-    eeprom.write_byte(EEPROM_PERSISTENCE_ADDRESS, EEPROM_SENTINEL);
+    eeprom
+        .write_byte(EEPROM_PERSISTENCE_ADDRESS, EEPROM_SENTINEL)
+        .unwrap();
 
     loop {
         systick.delay_ms(PERIOD_MS);
         led.toggle();
 
-        let mut rw_val = eeprom.read_byte(EEPROM_RW_ADDRESS);
+        let mut rw_val = eeprom.read_byte(EEPROM_RW_ADDRESS).unwrap();
         log::info!("Incrementing {rw_val}...");
         rw_val = rw_val.wrapping_add(1);
-        eeprom.write_byte(EEPROM_RW_ADDRESS, rw_val);
+        eeprom.write_byte(EEPROM_RW_ADDRESS, rw_val).unwrap();
+
+        if rw_val % 7 == 0 {
+            log::warn!(
+                "Intentionally reading out of bounds... {:?}",
+                eeprom.read_byte(0xDEADBEEF)
+            );
+            log::warn!(
+                "Intentionally writing out of bounds... {:?}",
+                eeprom.read_byte(0xDEADBEEF)
+            );
+        }
     }
 }
