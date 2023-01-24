@@ -85,14 +85,14 @@ extern crate teensy4_fcb;
 
 pub use teensy4_pins as pins;
 
-pub mod eeprom;
-
 #[cfg(all(target_arch = "arm", feature = "rt"))]
 mod rt;
 #[cfg(feature = "usb-logging")]
 #[cfg_attr(docsrs, doc(cfg(feature = "usb-logging")))]
 pub mod usb;
 
+mod eeprom;
+pub use eeprom::Eeprom;
 #[cfg(all(target_arch = "arm", feature = "rt"))]
 pub use rt::{dtcm_heap_start, heap_len, heap_start};
 
