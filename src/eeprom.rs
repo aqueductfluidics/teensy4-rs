@@ -57,6 +57,8 @@ fn bounds_check_slice<T>(addr: usize, slice: &[T]) -> Result<()> {
 /// Provides read/write access to EEPROM
 ///
 /// There's only one of these available in a given program.
+/// It implements some of the basic `embedded_storage` traits;
+/// consider using these for generality.
 pub struct Eeprom(());
 
 impl Eeprom {
@@ -127,6 +129,22 @@ impl Eeprom {
             }
         }
         Ok(())
+    }
+}
+
+impl embedded_storage::ReadStorage for Eeprom {
+    type Error = EepromError;
+    fn read(&mut self, offset: u32, bytes: &mut [u8]) -> Result<()> {
+        self.read_bytes_exact(offset as usize, bytes)
+    }
+    fn capacity(&self) -> usize {
+        EEPROM_CAPACITY
+    }
+}
+
+impl embedded_storage::Storage for Eeprom {
+    fn write(&mut self, offset: u32, bytes: &[u8]) -> core::result::Result<(), Self::Error> {
+        self.write_bytes_exact(offset as usize, bytes)
     }
 }
 
