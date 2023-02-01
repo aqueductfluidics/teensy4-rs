@@ -227,13 +227,11 @@ static void flash_wait()
 	} while (status & 1);
 	FLEXSPI_MCR0 |= FLEXSPI_MCR0_SWRESET; // purge stale data from FlexSPI's AHB FIFO
 	while (FLEXSPI_MCR0 & FLEXSPI_MCR0_SWRESET) ; // wait
-	__enable_irq();
 }
 
 // write bytes into flash memory (which is already erased to 0xFF)
 void eepromemu_flash_write(void *addr, const void *data, uint32_t len)
 {
-	__disable_irq();
 	FLEXSPI_LUTKEY = FLEXSPI_LUTKEY_VALUE;
 	FLEXSPI_LUTCR = FLEXSPI_LUTCR_UNLOCK;
 	FLEXSPI_IPCR0 = 0;
@@ -273,7 +271,6 @@ void eepromemu_flash_write(void *addr, const void *data, uint32_t len)
 // erase a 4K sector
 void eepromemu_flash_erase_sector(void *addr)
 {
-	__disable_irq();
 	FLEXSPI_LUTKEY = FLEXSPI_LUTKEY_VALUE;
 	FLEXSPI_LUTCR = FLEXSPI_LUTCR_UNLOCK;
 	FLEXSPI_LUT60 = LUT0(CMD_SDR, PINS1, 0x06); // 06 = write enable
