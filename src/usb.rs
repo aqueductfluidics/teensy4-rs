@@ -446,7 +446,8 @@ impl fmt::Write for Writer {
         let mut at_linefeed = false;
         for line in string.split('\n') {
             if at_linefeed {
-                match self.write("\r\n") {
+                // write \0 for COBS
+                match self.write("\0\r\n") {
                     Err(Error::NotConfigured) => return Ok(()),
                     Err(_) => return Err(fmt::Error),
                     Ok(size) if size < 2 => return Err(fmt::Error),
