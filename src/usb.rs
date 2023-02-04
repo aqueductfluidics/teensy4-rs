@@ -380,10 +380,26 @@ impl ::log::Log for Logger {
     }
 }
 
-pub fn write_data<B: AsRef<[u8]>>(b: B) {
+/// Writes raw bytes to the USB serial host and terminates the value with CR-LF chars `\r\n`
+pub fn write_data(b: &[u8]) -> Result<usize, Error> {
     let mut w = unsafe { Writer::new() };
-    w.write(b).ok();
+
+    let mut offset: usize = 0;
+
+    loop {
+        let n = match w.write(b[offset..].as_ref()) {
+            Err(e) => return Err(e),
+            Ok(n) => n,
+        };
+        offset += n;
+        if offset >= b.len() {
+            break;
+        }
+    }
+
     w.write("\r\n").ok();
+
+    Ok(offset + 2)
 }
 
 /// A type that can send data to a USB serial host
