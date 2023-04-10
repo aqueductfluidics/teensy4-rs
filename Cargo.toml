@@ -48,8 +48,7 @@ version = "0.3"
 
 [dependencies.imxrt-hal]
 git = "https://github.com/aqueductfluidics/imxrt-hal"
-rev = "938226e"
-branch = "aq/local"
+rev = "653846d"
 
 [dependencies.teensy4-pins]
 version = "0.2"
