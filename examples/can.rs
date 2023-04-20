@@ -2,8 +2,8 @@
 //!
 //! Pinout:
 //!
-//! - Teensy 4 Pin 22 (CAN1 TX) to TX pin of CAN Transceiver 
-//! - Teensy 4 Pin 23 (CAN2 RX) to RX pin of CAN Transceiver 
+//! - Teensy 4 Pin 22 (CAN1 TX) to TX pin of CAN Transceiver
+//! - Teensy 4 Pin 23 (CAN2 RX) to RX pin of CAN Transceiver
 //!
 //! A Can transceiver (such as the Texas Instruments SN65HVD230) is required for this demo.
 //!
@@ -46,7 +46,7 @@ fn main() -> ! {
     );
 
     let mut can1 = can1_builder.build(pins.p22, pins.p23);
-    
+
     can1.set_baud_rate(1_000_000);
     can1.set_max_mailbox(16);
     can1.enable_fifo();
